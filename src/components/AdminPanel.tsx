@@ -1,21 +1,21 @@
-import { BarChart3, FileText, Calendar, TrendingUp, Tag } from 'lucide-react';
+import { BarChart3, FileText, BookOpen, TrendingUp, Tag } from 'lucide-react';
 import { Button } from './ui/button';
 
 interface AdminPanelProps {
   postsCount: number;
-  eventsCount: number;
+  articlesCount: number;
   categoriesCount?: number;
   onManageCategories?: () => void;
 }
 
-export function AdminPanel({ postsCount, eventsCount, categoriesCount = 0, onManageCategories }: AdminPanelProps) {
+export function AdminPanel({ postsCount, articlesCount, categoriesCount = 0, onManageCategories }: AdminPanelProps) {
   return (
     <div className="space-y-6">
       {/* Welcome */}
       <div className="card-gradient rounded-xl p-6 border border-white/10 shadow-xl">
         <h2 className="text-white text-xl mb-2">Painel do Administrador</h2>
         <p className="text-gray-400 text-sm">
-          Gerencie posts, eventos e conteúdo do Barbacena.wiki
+          Gerencie posts, artigos da wikipédia e conteúdo do Barbacena.wiki
         </p>
       </div>
 
@@ -32,11 +32,11 @@ export function AdminPanel({ postsCount, eventsCount, categoriesCount = 0, onMan
 
         <div className="card-gradient rounded-xl p-5 border border-white/10 shadow-xl">
           <div className="flex items-center justify-between mb-3">
-            <Calendar className="h-8 w-8 text-green-400" />
+            <BookOpen className="h-8 w-8 text-green-400" />
             <span className="text-xs text-gray-500">Total</span>
           </div>
-          <div className="text-2xl text-white mb-1">{eventsCount}</div>
-          <div className="text-xs text-gray-400">Eventos Cadastrados</div>
+          <div className="text-2xl text-white mb-1">{articlesCount}</div>
+          <div className="text-xs text-gray-400">Artigos Wikipédia</div>
         </div>
 
         <div 
@@ -70,8 +70,8 @@ export function AdminPanel({ postsCount, eventsCount, categoriesCount = 0, onMan
             <span className="px-2 py-1 bg-yellow-500/20 text-yellow-400 rounded-full text-xs">0</span>
           </div>
           <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/5">
-            <span className="text-gray-300">Eventos próximos (7 dias)</span>
-            <span className="px-2 py-1 bg-blue-500/20 text-blue-400 rounded-full text-xs">3</span>
+            <span className="text-gray-300">Artigos recentes (7 dias)</span>
+            <span className="px-2 py-1 bg-blue-500/20 text-blue-400 rounded-full text-xs">{articlesCount}</span>
           </div>
           <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/5">
             <span className="text-gray-300">Comentários para revisar</span>

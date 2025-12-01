@@ -2,28 +2,28 @@ import { useState } from 'react';
 import { Header } from './components/Header';
 import { HomeSection } from './components/HomeSection';
 import { PostsSection } from './components/PostsSection';
-import { EventsSection } from './components/EventsSection';
 import { AboutSection } from './components/AboutSection';
 import { PostView, Post } from './components/PostView';
-import { EventView } from './components/EventView';
 import { AdminPanel } from './components/AdminPanel';
 import { PostForm } from './components/PostForm';
-import { EventForm } from './components/EventForm';
 import { CategoryManager } from './components/CategoryManager';
+import { WikipediaSection } from './components/WikipediaSection';
+import { WikiArticleView } from './components/WikiArticleView';
+import { WikiEditor } from './components/WikiEditor';
 import { Sidebar } from './components/Sidebar';
 import { postsData as initialPostsData } from './data/posts';
-import { eventsData as initialEventsData, Event } from './data/events';
+import { wikipediaData as initialWikipediaData, WikiArticle } from './data/wikipedia';
 import { toast, Toaster } from 'sonner@2.0.3';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('inicio');
   const [selectedPostId, setSelectedPostId] = useState<number | null>(null);
-  const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
+  const [selectedArticleId, setSelectedArticleId] = useState<number | null>(null);
   const [isAdminMode, setIsAdminMode] = useState(false);
   
-  // Manage posts and events state
+  // Manage posts and wikipedia state
   const [posts, setPosts] = useState<Post[]>(initialPostsData);
-  const [events, setEvents] = useState<Event[]>(initialEventsData);
+  const [articles, setArticles] = useState<WikiArticle[]>(initialWikipediaData);
   
   // Categories state - initialize with existing categories from posts
   const [categories, setCategories] = useState<string[]>(() => {
@@ -33,26 +33,26 @@ export default function App() {
   
   // Form states
   const [showPostForm, setShowPostForm] = useState(false);
-  const [showEventForm, setShowEventForm] = useState(false);
+  const [showWikiEditor, setShowWikiEditor] = useState(false);
   const [showCategoryManager, setShowCategoryManager] = useState(false);
   const [editingPost, setEditingPost] = useState<Post | undefined>(undefined);
-  const [editingEvent, setEditingEvent] = useState<Event | undefined>(undefined);
+  const [editingArticle, setEditingArticle] = useState<WikiArticle | undefined>(undefined);
 
   const handlePostClick = (id: number) => {
     setSelectedPostId(id);
-    setSelectedEventId(null);
+    setSelectedArticleId(null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleEventClick = (id: number) => {
-    setSelectedEventId(id);
+  const handleArticleClick = (id: number) => {
+    setSelectedArticleId(id);
     setSelectedPostId(null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleBackToList = () => {
     setSelectedPostId(null);
-    setSelectedEventId(null);
+    setSelectedArticleId(null);
   };
 
   const handleToggleAdmin = () => {
@@ -112,40 +112,40 @@ export default function App() {
     setEditingPost(undefined);
   };
 
-  // Event CRUD
-  const handleNewEvent = () => {
-    setEditingEvent(undefined);
-    setShowEventForm(true);
+  // Wikipedia Article CRUD
+  const handleNewArticle = () => {
+    setEditingArticle(undefined);
+    setShowWikiEditor(true);
   };
 
-  const handleEditEvent = (id: number) => {
-    const event = events.find(e => e.id === id);
-    if (event) {
-      setEditingEvent(event);
-      setShowEventForm(true);
+  const handleEditArticle = (id: number) => {
+    const article = articles.find(a => a.id === id);
+    if (article) {
+      setEditingArticle(article);
+      setShowWikiEditor(true);
     }
   };
 
-  const handleDeleteEvent = (id: number) => {
-    if (confirm('Tem certeza que deseja deletar este evento?')) {
-      setEvents(events.filter(e => e.id !== id));
-      toast.success('Evento deletado com sucesso');
+  const handleDeleteArticle = (id: number) => {
+    if (confirm('Tem certeza que deseja deletar este artigo?')) {
+      setArticles(articles.filter(a => a.id !== id));
+      toast.success('Artigo deletado com sucesso');
     }
   };
 
-  const handleSaveEvent = (eventData: Omit<Event, 'id'> & { id?: number }) => {
-    if (eventData.id) {
+  const handleSaveArticle = (articleData: Omit<WikiArticle, 'id'> & { id?: number }) => {
+    if (articleData.id) {
       // Edit existing
-      setEvents(events.map(e => e.id === eventData.id ? { ...eventData, id: eventData.id } : e));
-      toast.success('Evento atualizado com sucesso');
+      setArticles(articles.map(a => a.id === articleData.id ? { ...articleData, id: articleData.id } : a));
+      toast.success('Artigo atualizado com sucesso');
     } else {
       // Create new
-      const newEvent = { ...eventData, id: Math.max(...events.map(e => e.id)) + 1 };
-      setEvents([newEvent, ...events]);
-      toast.success('Evento criado com sucesso');
+      const newArticle = { ...articleData, id: Math.max(...articles.map(a => a.id)) + 1 };
+      setArticles([newArticle, ...articles]);
+      toast.success('Artigo criado com sucesso');
     }
-    setShowEventForm(false);
-    setEditingEvent(undefined);
+    setShowWikiEditor(false);
+    setEditingArticle(undefined);
   };
 
   // Category Management
@@ -175,7 +175,7 @@ export default function App() {
   };
 
   const selectedPost = selectedPostId ? posts.find(p => p.id === selectedPostId) : null;
-  const selectedEvent = selectedEventId ? events.find(e => e.id === selectedEventId) : null;
+  const selectedArticle = selectedArticleId ? articles.find(a => a.id === selectedArticleId) : null;
 
   return (
     <div className="min-h-screen bg-[#0a0a0a]">
@@ -195,7 +195,7 @@ export default function App() {
         onNavigate={(tab) => {
           setActiveTab(tab);
           setSelectedPostId(null);
-          setSelectedEventId(null);
+          setSelectedArticleId(null);
         }} 
         activeTab={activeTab}
         isAdminMode={isAdminMode}
@@ -208,15 +208,15 @@ export default function App() {
           <div className="lg:col-span-4">
             {selectedPost ? (
               <PostView post={selectedPost} onBack={handleBackToList} />
-            ) : selectedEvent ? (
-              <EventView event={selectedEvent} onBack={handleBackToList} />
+            ) : selectedArticle ? (
+              <WikiArticleView article={selectedArticle} onBack={handleBackToList} />
             ) : (
               <>
                 {activeTab === 'inicio' && (
                   isAdminMode ? (
                     <AdminPanel 
                       postsCount={posts.length} 
-                      eventsCount={events.length}
+                      articlesCount={articles.length}
                       categoriesCount={categories.length}
                       onManageCategories={() => setShowCategoryManager(true)}
                     />
@@ -236,14 +236,14 @@ export default function App() {
                     onManageCategories={() => setShowCategoryManager(true)}
                   />
                 )}
-                {activeTab === 'eventos' && (
-                  <EventsSection 
-                    events={events}
-                    onEventClick={handleEventClick}
+                {activeTab === 'wikipedia' && (
+                  <WikipediaSection 
+                    articles={articles}
+                    onArticleClick={handleArticleClick}
                     isAdminMode={isAdminMode}
-                    onNewEvent={handleNewEvent}
-                    onEditEvent={handleEditEvent}
-                    onDeleteEvent={handleDeleteEvent}
+                    onNewArticle={handleNewArticle}
+                    onEditArticle={handleEditArticle}
+                    onDeleteArticle={handleDeleteArticle}
                   />
                 )}
                 {activeTab === 'sobre' && <AboutSection />}
@@ -289,13 +289,13 @@ export default function App() {
         />
       )}
 
-      {showEventForm && (
-        <EventForm
-          event={editingEvent}
-          onSave={handleSaveEvent}
+      {showWikiEditor && (
+        <WikiEditor
+          article={editingArticle}
+          onSave={handleSaveArticle}
           onCancel={() => {
-            setShowEventForm(false);
-            setEditingEvent(undefined);
+            setShowWikiEditor(false);
+            setEditingArticle(undefined);
           }}
         />
       )}

@@ -52,14 +52,14 @@ export function Header({ onNavigate, activeTab, isAdminMode, onToggleAdmin }: He
               Posts
             </button>
             <button
-              onClick={() => onNavigate('eventos')}
+              onClick={() => onNavigate('wikipedia')}
               className={`px-4 py-2 rounded-lg text-sm transition-all duration-300 ${
-                activeTab === 'eventos' 
+                activeTab === 'wikipedia' 
                   ? 'bg-white/10 text-white backdrop-blur-sm' 
                   : 'text-gray-400 hover:text-white hover:bg-white/5'
               }`}
             >
-              Eventos
+              Wikipédia
             </button>
             <button
               onClick={() => onNavigate('sobre')}
