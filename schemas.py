@@ -1,17 +1,14 @@
 # schemas.py
 from datetime import datetime
 from typing import List, Optional
-
-from pydantic import BaseModel
-
+from pydantic import BaseModel, ConfigDict
 
 class MidiaRead(BaseModel):
     id: int
     tipo: str
     file_path: str
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class PostRead(BaseModel):
@@ -23,5 +20,4 @@ class PostRead(BaseModel):
     published_at: datetime
     midias: List[MidiaRead] = []
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
