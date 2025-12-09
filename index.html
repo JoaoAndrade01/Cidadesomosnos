@@ -2,176 +2,492 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <title>CidadeSomosNós – Arquivo de Posts</title>
+  <title>Cidade Somos Nós – Arquivo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  
+  <!-- Fonte Moderna -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;900&display=swap" rel="stylesheet">
+
   <style>
-    body { font-family: system-ui, sans-serif; margin: 0; padding: 1rem; background: #f5f5f5; }
-    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
-    h1 { margin: 0; font-size: 1.5rem; }
-    button { padding: 0.5rem 1rem; border-radius: 4px; border: none; cursor: pointer; }
-    #create-post-btn { background: #2563eb; color: white; }
-    #post-form-container { display: none; margin-bottom: 1rem; background: white; padding: 1rem; border-radius: 8px; }
-    label { display: block; margin-top: 0.5rem; font-size: 0.9rem; }
-    input, textarea { width: 100%; padding: 0.4rem; margin-top: 0.25rem; box-sizing: border-box; }
-    textarea { min-height: 100px; }
-    .post-card { background: white; padding: 1rem; margin-bottom: 1rem; border-radius: 8px; }
-    .post-title { font-weight: bold; margin-bottom: 0.25rem; }
-    .post-meta { font-size: 0.8rem; color: #666; margin-bottom: 0.5rem; }
-    .post-image { max-width: 100%; border-radius: 8px; margin: 0.5rem 0; }
-    .links { font-size: 0.85rem; margin-top: 0.5rem; }
-    .links a { color: #2563eb; text-decoration: none; }
-    .links a:hover { text-decoration: underline; }
+    /* --- Variáveis e Reset --- */
+    :root {
+      --primary: #000000;
+      --bg-color: #f8f9fa;
+      --card-bg: #ffffff;
+      --text-main: #111111;
+      --text-secondary: #666666;
+      --border-radius: 12px;
+      --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    * { box-sizing: border-box; }
+    
+    body { 
+      font-family: 'Inter', sans-serif; 
+      margin: 0; 
+      padding: 0; 
+      background: var(--bg-color); 
+      color: var(--text-main);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* --- Header --- */
+    header {
+      background: white;
+      padding: 1.5rem 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      border-bottom: 1px solid #eee;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      max-width: 250px;
+    }
+
+    .logo-container img {
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+    }
+
+    .header-controls {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+
+    @media(min-width: 768px) {
+      header {
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 1rem 3rem;
+      }
+      .logo-container { max-width: 200px; margin: 0; }
+      .header-controls { width: auto; }
+    }
+
+    /* --- Botões --- */
+    button {
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      transition: var(--transition);
+      border: none;
+      outline: none;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+      background: #333;
+    }
+
+    .btn-secondary {
+      background: #e0e0e0;
+      color: #333;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      font-weight: 600;
+    }
+    
+    .btn-secondary:hover { background: #d0d0d0; }
+
+    /* --- Container Principal --- */
+    main {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    /* --- Grid de Posts --- */
     #posts-container {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-      gap: 8px;
+      grid-template-columns: repeat(3, 1fr); /* Padrão 3 colunas (Insta) */
+      gap: 1.5rem; /* Espaço maior para elegância */
+    }
+
+    @media(max-width: 768px) {
+      #posts-container {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
+      }
+    }
+    
+    @media(max-width: 480px) {
+      #posts-container {
+        grid-template-columns: 1fr;
+      }
     }
 
     .post-thumb {
       position: relative;
       width: 100%;
-      aspect-ratio: 1 / 1; /* quadradinho estilo insta */
+      aspect-ratio: 1 / 1;
       overflow: hidden;
-      border-radius: 8px;
-      background: #ddd;
+      border-radius: var(--border-radius);
+      background: #e5e5e5;
       cursor: pointer;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      transition: var(--transition);
     }
 
-    .post-thumb img {
+    .post-thumb:hover {
+      transform: scale(1.02);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+      z-index: 2;
+    }
+
+    .post-thumb img, .post-thumb video {
       width: 100%;
       height: 100%;
       object-fit: cover;
       display: block;
     }
-    .post-thumb video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
+
+    /* Overlay com título ao passar o mouse */
+    .post-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      opacity: 0;
+      transition: opacity 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      text-align: center;
+      padding: 1rem;
     }
 
+    .post-thumb:hover .post-overlay {
+      opacity: 1;
+    }
+
+    /* --- Modal de Detalhes --- */
     #post-detail {
       position: fixed;
       inset: 0;
       display: none;
       align-items: center;
       justify-content: center;
-      z-index: 1000;
+      z-index: 2000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    #post-detail.active {
+      display: flex;
+      opacity: 1;
     }
 
     #post-detail-backdrop {
       position: absolute;
       inset: 0;
-      background: rgba(0, 0, 0, 0.6);
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(5px);
     }
 
     #post-detail-card {
       position: relative;
-      background: #fff;
-      border-radius: 12px;
-      max-width: 900px;
-      width: 95%;
-      max-height: 90vh;
-      padding: 1rem;
+      background: var(--card-bg);
+      border-radius: 16px;
+      max-width: 1000px;
+      width: 90%;
+      height: 85vh;
       display: flex;
       flex-direction: column;
-      gap: 0.75rem;
-      z-index: 1001;
+      overflow: hidden;
+      z-index: 2001;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
     }
 
-    #post-detail-media-container {
+    @media(min-width: 768px) {
+      #post-detail-card {
+        flex-direction: row;
+      }
+    }
+
+    /* Área da Mídia no Modal */
+    .detail-media-area {
+      flex: 2;
+      background: #000;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 0.5rem;
+      position: relative;
+      overflow: hidden;
     }
 
-    #post-detail-media img,
+    #post-detail-media img, 
     #post-detail-media video {
       max-width: 100%;
-      max-height: 60vh;
-      border-radius: 8px;
+      max-height: 100%;
+      object-fit: contain;
     }
 
     .carousel-btn {
-      border: none;
-      background: rgba(0, 0, 0, 0.5);
-      color: #fff;
-      width: 32px;
-      height: 32px;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255,255,255,0.2);
+      color: white;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
-      cursor: pointer;
-      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+    .carousel-btn:hover { background: rgba(255,255,255,0.4); }
+    .carousel-btn:disabled { display: none; }
+    #prev-media-btn { left: 1rem; }
+    #next-media-btn { right: 1rem; }
+
+    /* Área de Informações no Modal */
+    .detail-info-area {
+      flex: 1;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      border-left: 1px solid #eee;
     }
 
-    .carousel-btn:disabled {
-      opacity: 0.3;
-      cursor: default;
+    .detail-header {
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 1rem;
     }
 
-    #post-detail-info {
+    .detail-title {
+      font-size: 1.5rem;
+      font-weight: 900;
+      line-height: 1.2;
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+    }
+
+    .detail-date {
+      font-size: 0.85rem;
+      color: #888;
+      font-weight: 500;
+    }
+
+    .detail-content {
+      font-size: 1rem;
+      line-height: 1.6;
+      color: #333;
+      white-space: pre-wrap;
+      flex-grow: 1;
+    }
+
+    .detail-footer {
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid #eee;
+    }
+
+    .insta-link {
+      display: inline-block;
+      color: var(--primary);
+      font-weight: 600;
+      text-decoration: none;
+      border-bottom: 2px solid transparent;
+      transition: border-color 0.2s;
+    }
+    .insta-link:hover { border-bottom-color: var(--primary); }
+
+    .close-modal-btn {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: transparent;
+      color: #000;
+      font-size: 1.5rem;
+      z-index: 10;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .close-modal-btn:hover { background: rgba(0,0,0,0.05); }
+
+    @media(max-width: 768px) {
+      .close-modal-btn {
+        color: white;
+        background: rgba(0,0,0,0.5);
+      }
+    }
+
+    /* --- Formulário Flutuante --- */
+    #post-form-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 3000;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(3px);
+    }
+    
+    .form-card {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    }
+
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { 
+      display: block; 
+      margin-bottom: 0.5rem; 
+      font-weight: 600; 
       font-size: 0.9rem;
     }
+    
+    .form-group input, 
+    .form-group textarea {
+      width: 100%;
+      padding: 0.8rem;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-family: inherit;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      border-color: var(--primary);
+      outline: none;
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+      margin-top: 1.5rem;
+    }
+
   </style>
 </head>
 
 <body>
+
   <header>
-    <h1>CidadeSomosNós – Arquivo de Posts</h1>
-    <button id="create-post-btn">CRIAR POST</button>
+    <div class="logo-container">
+      <img src="/uploads/logo.jpg" alt="Logo Cidade Somos Nós">
+    </div>
+    <div class="header-controls">
+      <button id="create-post-btn" class="btn-primary">+ Novo Post</button>
+    </div>
   </header>
 
-  <section id="post-form-container">
-    <h2>Novo Post</h2>
-    <form id="post-form" enctype="multipart/form-data">
-      <label>Título
-        <input type="text" name="title" required />
-      </label>
+  <main>
+    <section id="posts-container">
+      <!-- Os posts serão inseridos aqui via JS -->
+      <p style="text-align:center; padding: 2rem;">Carregando posts...</p>
+    </section>
+  </main>
 
-      <label>Texto
-        <textarea name="content" required></textarea>
-      </label>
+  <!-- Modal de Criação -->
+  <div id="post-form-modal">
+    <div class="form-card">
+      <h2 style="margin-top:0; margin-bottom:1.5rem;">Novo Post</h2>
+      <form id="post-form" enctype="multipart/form-data">
+        <div class="form-group">
+          <label>Título</label>
+          <input type="text" name="title" required placeholder="Ex: Ação na Praça Central" />
+        </div>
 
-      <label>Mídias (imagens e vídeos)
-        <input type="file" name="media" accept="image/*,video/*" multiple required />
-      </label>
+        <div class="form-group">
+          <label>Texto</label>
+          <textarea name="content" rows="4" required placeholder="Descreva o que aconteceu..."></textarea>
+        </div>
 
+        <div class="form-group">
+          <label>Mídias (Imagens/Vídeos)</label>
+          <input type="file" id="media-input" name="media" accept="image/*,video/*" multiple required />
+        </div>
 
-      <label>Data de publicação no Instagram
-        <input type="date" name="published_at" required />
-      </label>
+        <div class="form-group">
+          <label>Data de publicação</label>
+          <input type="date" name="published_at" required />
+        </div>
 
-      <label>URL do post no Instagram (opcional)
-        <input type="url" name="instagram_url" />
-      </label>
+        <div class="form-group">
+          <label>Link do Instagram (Opcional)</label>
+          <input type="url" name="instagram_url" placeholder="https://instagram.com/..." />
+        </div>
 
-      <div style="margin-top:0.75rem;">
-        <button type="submit">Publicar</button>
-        <button type="button" id="cancel-btn">Cancelar</button>
-      </div>
-    </form>
-  </section>
+        <div class="form-actions">
+          <button type="button" id="cancel-form-btn" class="btn-secondary">Cancelar</button>
+          <button type="submit" class="btn-primary">Publicar</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
-  <section id="posts-container"></section>
-
-  <section id="post-detail" style="display:none;">
+  <!-- Modal de Detalhes (Lightbox) -->
+  <section id="post-detail">
     <div id="post-detail-backdrop"></div>
+    <button id="close-detail-btn" class="close-modal-btn">&times;</button>
+    
     <div id="post-detail-card">
-      <div id="post-detail-media-container">
+      
+      <!-- Lado Esquerdo: Mídia -->
+      <div class="detail-media-area">
         <button id="prev-media-btn" class="carousel-btn">&#10094;</button>
         <div id="post-detail-media"></div>
         <button id="next-media-btn" class="carousel-btn">&#10095;</button>
       </div>
-      <div id="post-detail-info"></div>
-      <button id="close-detail-btn">Fechar</button>
+
+      <!-- Lado Direito: Info -->
+      <div class="detail-info-area">
+        <div id="post-detail-info"></div>
+      </div>
+
     </div>
   </section>
 
-  
   <script>
+    // --- Lógica Principal ---
+    
+    // Elementos DOM
     const createBtn = document.getElementById("create-post-btn");
-    const formContainer = document.getElementById("post-form-container");
-    const cancelBtn = document.getElementById("cancel-btn");
+    const formModal = document.getElementById("post-form-modal");
+    const cancelFormBtn = document.getElementById("cancel-form-btn");
     const form = document.getElementById("post-form");
     const postsContainer = document.getElementById("posts-container");
 
@@ -183,24 +499,50 @@
     const prevMediaBtn = document.getElementById("prev-media-btn");
     const nextMediaBtn = document.getElementById("next-media-btn");
 
+    // Estado
     let postsCache = [];
     let currentPost = null;
     let currentMediaIndex = 0;
 
+    // --- Funções de UI ---
+
     function toggleForm(show) {
-      formContainer.style.display = show ? "block" : "none";
+      formModal.style.display = show ? "flex" : "none";
     }
 
     function toggleDetail(show) {
-      postDetailSection.style.display = show ? "flex" : "none";
+      if (show) {
+        postDetailSection.classList.add('active');
+      } else {
+        postDetailSection.classList.remove('active');
+        // Pequeno delay para esperar a animação de fade out
+        setTimeout(() => {
+            if(!postDetailSection.classList.contains('active')) {
+                postDetailSection.style.display = "none";
+            }
+        }, 300);
+        
+        if (show) postDetailSection.style.display = "flex"; // Fallback imediato se needed
+      }
     }
 
+    // Event Listeners
     createBtn?.addEventListener("click", () => toggleForm(true));
-    cancelBtn?.addEventListener("click", () => toggleForm(false));
-
+    cancelFormBtn?.addEventListener("click", () => toggleForm(false));
+    
     closeDetailBtn.addEventListener("click", () => toggleDetail(false));
     postDetailBackdrop.addEventListener("click", () => toggleDetail(false));
 
+    // Navegação Teclado
+    document.addEventListener('keydown', (e) => {
+      if (postDetailSection.classList.contains('active')) {
+        if (e.key === 'Escape') toggleDetail(false);
+        if (e.key === 'ArrowLeft') prevMediaBtn.click();
+        if (e.key === 'ArrowRight') nextMediaBtn.click();
+      }
+    });
+
+    // Carousel Logic
     prevMediaBtn.addEventListener("click", () => {
       if (!currentPost) return;
       if (currentMediaIndex > 0) {
@@ -217,89 +559,113 @@
       }
     });
 
+    // --- Data Loading da API ---
+
     async function loadPosts() {
-      const res = await fetch("/api/posts");
-      const posts = await res.json();
-      postsCache = posts;
-      renderPostsGrid(posts);
+      try {
+        const res = await fetch("/api/posts");
+        if (!res.ok) {
+          throw new Error(`Erro na API: ${res.status}`);
+        }
+        const posts = await res.json();
+        postsCache = posts;
+        renderPostsGrid(posts);
+      } catch (error) {
+        console.error("Erro ao carregar posts:", error);
+        postsContainer.innerHTML = "<p style='grid-column: 1/-1; text-align:center; padding: 2rem; color: #666;'>Não foi possível carregar os posts. Tente novamente mais tarde.</p>";
+      }
     }
 
     function renderPostsGrid(posts) {
       postsContainer.innerHTML = "";
-      if (!posts.length) {
-        postsContainer.innerHTML = "<p>Não há posts ainda.</p>";
+      
+      if (!posts || !posts.length) {
+        postsContainer.innerHTML = "<div style='grid-column: 1/-1; text-align:center; padding: 2rem;'>Não há posts ainda.</div>";
         return;
       }
 
       posts.forEach(post => {
         const midias = post.midias || [];
-        if (!midias.length) {
-          return; // sem mídia nenhuma, ignora
-        }
+        if (!midias.length) return;
 
-        // tenta usar imagem; se não tiver, usa o primeiro vídeo
-        const capa =
-          midias.find(m => m.tipo === "image") ||
-          midias[0];
-
+        // Pega a primeira imagem ou o primeiro vídeo
+        const capa = midias.find(m => m.tipo === "image") || midias[0];
+        
         const div = document.createElement("div");
         div.className = "post-thumb";
 
-        // ao clicar, abre o detalhe começando nessa mídia
-        div.addEventListener("click", () => {
-          openPostDetail(post.id, capa.id);
-        });
-
+        // Cria container de mídia
+        let mediaEl;
         if (capa.tipo === "video") {
-          const video = document.createElement("video");
-          video.src = capa.file_path;
-          video.muted = true;
-          video.loop = true;
-          video.autoplay = true;
-          video.playsInline = true;
-          div.appendChild(video);
+          mediaEl = document.createElement("video");
+          mediaEl.muted = true;
+          // Se for vídeo, só atribui o src
+          mediaEl.src = capa.file_path; 
         } else {
-          const img = document.createElement("img");
-          img.src = capa.file_path;
-          img.alt = post.title || "";
-          div.appendChild(img);
+          mediaEl = document.createElement("img");
+          mediaEl.src = capa.file_path;
+          mediaEl.loading = "lazy";
         }
+
+        div.appendChild(mediaEl);
+        
+        // Overlay Effect
+        const overlay = document.createElement("div");
+        overlay.className = "post-overlay";
+        overlay.innerText = post.title || "Ver post";
+        div.appendChild(overlay);
+
+        // Click Event
+        div.addEventListener("click", () => {
+          openPostDetail(post.id);
+        });
 
         postsContainer.appendChild(div);
       });
     }
 
-    function openPostDetail(postId, midiaId) {
+    function openPostDetail(postId) {
       const post = postsCache.find(p => p.id === postId);
       if (!post) return;
 
       currentPost = post;
-      let idx = 0;
-      if (midiaId != null) {
-        const foundIndex = post.midias.findIndex(m => m.id === midiaId);
-        if (foundIndex >= 0) idx = foundIndex;
-      }
-      currentMediaIndex = idx;
+      currentMediaIndex = 0;
 
       renderPostDetail();
-      toggleDetail(true);
+      
+      // Necessário para animação de fade in
+      postDetailSection.style.display = "flex";
+      setTimeout(() => postDetailSection.classList.add('active'), 10);
     }
 
     function renderPostDetail() {
       if (!currentPost) return;
 
       const publishedAt = new Date(currentPost.published_at);
+      
+      // Formata data
+      const dateStr = publishedAt.toLocaleDateString("pt-BR", {
+        day: 'numeric', month: 'long', year: 'numeric'
+      });
 
+      // Renderiza Info
       postDetailInfo.innerHTML = `
-        <div class="post-title">${currentPost.title || ""}</div>
-        <div class="post-meta">
-          Publicado em: ${publishedAt.toLocaleDateString("pt-BR")}
+        <div class="detail-header">
+          <div class="detail-title">${currentPost.title || "Sem título"}</div>
+          <div class="detail-date">${dateStr}</div>
         </div>
-        <div style="margin:0.5rem 0;">
+        
+        <div class="detail-content">
           ${ (currentPost.content || "").replace(/\n/g, "<br>") }
         </div>
-        <div class="links">
-          ${ currentPost.instagram_url ? `<a href="${currentPost.instagram_url}" target="_blank">Ver no Instagram</a>` : "" }
+        
+        <div class="detail-footer">
+          ${ currentPost.instagram_url ? 
+            `<a href="${currentPost.instagram_url}" target="_blank" class="insta-link">
+               Ver no Instagram &#8599;
+             </a>` : 
+            "" 
+          }
         </div>
       `;
 
@@ -311,51 +677,85 @@
       if (!currentPost || !currentPost.midias || !currentPost.midias.length) return;
 
       const midia = currentPost.midias[currentMediaIndex];
+      const src = midia.file_path;
+      const type = midia.tipo;
 
       let mediaElement;
-      if (midia.tipo === "video") {
+      
+      if (type === "video") {
         mediaElement = document.createElement("video");
         mediaElement.controls = true;
-        mediaElement.preload = "metadata";
-
-        const source = document.createElement("source");
-        source.src = midia.file_path;
-        mediaElement.appendChild(source);
+        mediaElement.autoplay = true; // Auto play dentro do modal
+        mediaElement.src = src;
       } else {
         mediaElement = document.createElement("img");
-        mediaElement.src = midia.file_path;
+        mediaElement.src = src;
       }
+
+      // Animação de fade simples entre imagens
+      mediaElement.style.opacity = 0;
+      mediaElement.onload = () => mediaElement.style.opacity = 1;
+      // Para video
+      mediaElement.onloadeddata = () => mediaElement.style.opacity = 1;
+      // Fallback transition
+      setTimeout(() => mediaElement.style.opacity = 1, 100);
+      mediaElement.style.transition = "opacity 0.3s";
 
       postDetailMedia.appendChild(mediaElement);
 
-      // habilita/desabilita botões do carrossel
+      // Controle de botões
       prevMediaBtn.disabled = currentMediaIndex === 0;
       nextMediaBtn.disabled = currentMediaIndex === currentPost.midias.length - 1;
+      
+      // Esconder botões se só tiver 1 mídia
+      if (currentPost.midias.length <= 1) {
+        prevMediaBtn.style.display = 'none';
+        nextMediaBtn.style.display = 'none';
+      } else {
+        prevMediaBtn.style.display = 'flex';
+        nextMediaBtn.style.display = 'flex';
+      }
     }
 
-    // envio do formulário para criar posts (se você já estiver usando isso)
+    // --- Envio real do formulário ---
     form?.addEventListener("submit", async (e) => {
       e.preventDefault();
 
       const formData = new FormData(form);
+      const submitBtn = form.querySelector('button[type="submit"]');
+      const originalBtnText = submitBtn.innerText;
+      
+      // UI de carregamento
+      submitBtn.disabled = true;
+      submitBtn.innerText = "Enviando...";
 
-      const res = await fetch("/api/posts", {
-        method: "POST",
-        body: formData,
-      });
+      try {
+        const res = await fetch("/api/posts", {
+          method: "POST",
+          body: formData,
+        });
 
-      if (res.ok) {
-        form.reset();
-        toggleForm(false);
-        loadPosts();
-      } else {
-        alert("Erro ao criar post");
+        if (res.ok) {
+          form.reset();
+          toggleForm(false);
+          loadPosts(); // Recarrega a lista do servidor
+        } else {
+          const errorMsg = await res.text();
+          console.error("Erro no envio:", errorMsg);
+          alert("Erro ao criar post. Verifique o console ou tente novamente.");
+        }
+      } catch (error) {
+        console.error("Erro na requisição:", error);
+        alert("Erro de conexão ao tentar criar o post.");
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerText = originalBtnText;
       }
     });
 
+    // Iniciar carregamento real
     loadPosts();
+
   </script>
-
-
 </body>
 </html>
