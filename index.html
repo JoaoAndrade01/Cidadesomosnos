@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>CidadeSomosNós – Arquivo de Posts</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 0; padding: 1rem; background: #f5f5f5; }
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+    h1 { margin: 0; font-size: 1.5rem; }
+    button { padding: 0.5rem 1rem; border-radius: 4px; border: none; cursor: pointer; }
+    #create-post-btn { background: #2563eb; color: white; }
+    #post-form-container { display: none; margin-bottom: 1rem; background: white; padding: 1rem; border-radius: 8px; }
+    label { display: block; margin-top: 0.5rem; font-size: 0.9rem; }
+    input, textarea { width: 100%; padding: 0.4rem; margin-top: 0.25rem; box-sizing: border-box; }
+    textarea { min-height: 100px; }
+    .post-card { background: white; padding: 1rem; margin-bottom: 1rem; border-radius: 8px; }
+    .post-title { font-weight: bold; margin-bottom: 0.25rem; }
+    .post-meta { font-size: 0.8rem; color: #666; margin-bottom: 0.5rem; }
+    .post-image { max-width: 100%; border-radius: 8px; margin: 0.5rem 0; }
+    .links { font-size: 0.85rem; margin-top: 0.5rem; }
+    .links a { color: #2563eb; text-decoration: none; }
+    .links a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>CidadeSomosNós – Arquivo de Posts</h1>
+    <button id="create-post-btn">CRIAR POST</button>
+  </header>
+
+  <section id="post-form-container">
+    <h2>Novo Post</h2>
+    <form id="post-form" enctype="multipart/form-data">
+      <label>Título
+        <input type="text" name="title" required />
+      </label>
+
+      <label>Texto
+        <textarea name="content" required></textarea>
+      </label>
+
+      <label>Imagem (arquivo)
+        <input type="file" name="image" accept="image/*" required />
+      </label>
+
+      <label>Data de publicação no Instagram
+        <input type="date" name="published_at" required />
+      </label>
+
+      <label>URL do post no Instagram (opcional)
+        <input type="url" name="instagram_url" />
+      </label>
+
+      <div style="margin-top:0.75rem;">
+        <button type="submit">Publicar</button>
+        <button type="button" id="cancel-btn">Cancelar</button>
+      </div>
+    </form>
+  </section>
+
+  <section id="posts-container"></section>
+
+  <script>
+    const createBtn = document.getElementById("create-post-btn");
+    const formContainer = document.getElementById("post-form-container");
+    const cancelBtn = document.getElementById("cancel-btn");
+    const form = document.getElementById("post-form");
+    const postsContainer = document.getElementById("posts-container");
+
+    function toggleForm(show) {
+      formContainer.style.display = show ? "block" : "none";
+    }
+
+    createBtn.addEventListener("click", () => toggleForm(true));
+    cancelBtn.addEventListener("click", () => toggleForm(false));
+
+    async function loadPosts() {
+      const res = await fetch("/api/posts");
+      const posts = await res.json();
+      renderPosts(posts);
+    }
+
+    function renderPosts(posts) {
+      postsContainer.innerHTML = "";
+      if (posts.length === 0) {
+        postsContainer.innerHTML = "<p>Não há posts ainda.</p>";
+        return;
+      }
+      posts.forEach(post => {
+        const div = document.createElement("div");
+        div.className = "post-card";
+
+        const publishedAt = new Date(post.published_at);
+
+        div.innerHTML = `
+          <div class="post-title">${post.title}</div>
+          <div class="post-meta">
+            Publicado em: ${publishedAt.toLocaleDateString("pt-BR")}
+          </div>
+          ${post.image_path ? `<img src="${post.image_path}" class="post-image" />` : ""}
+          <div>${post.content.replace(/\n/g, "<br>")}</div>
+          <div class="links">
+            ${post.instagram_url ? `<a href="${post.instagram_url}" target="_blank">Ver no Instagram</a>` : ""}
+          </div>
+        `;
+        postsContainer.appendChild(div);
+      });
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(form);
+
+      const res = await fetch("/api/posts", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (res.ok) {
+        form.reset();
+        toggleForm(false);
+        loadPosts();
+      } else {
+        alert("Erro ao criar post");
+      }
+    });
+
+    loadPosts();
+  </script>
+</body>
+</html>

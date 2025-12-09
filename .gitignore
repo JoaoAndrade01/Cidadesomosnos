@@ -1,0 +1,14 @@
+# ambiente virtual
+venv/
+
+# uploads de mídia
+uploads/
+
+# caches python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# configs de editor
+.vscode/
+.idea/
