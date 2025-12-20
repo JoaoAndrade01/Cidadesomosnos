@@ -16,6 +16,8 @@ class PostRead(BaseModel):
     title: str
     content: str
     instagram_url: Optional[str]
+    author: Optional[str] = "Cidade Somos Nós"
+    category: Optional[str] = "Geral"
     created_at: datetime
     published_at: datetime
     midias: List[MidiaRead] = []

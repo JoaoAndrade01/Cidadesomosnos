@@ -25,6 +25,10 @@ class Post(Base):
     image_path = Column(String, nullable=True)
 
     instagram_url = Column(String, nullable=True)
+    
+    # Campos adicionais para o design
+    author = Column(String(100), nullable=True, default="Cidade Somos Nós")
+    category = Column(String(50), nullable=True, default="Geral")
 
     created_at = Column(
         DateTime,

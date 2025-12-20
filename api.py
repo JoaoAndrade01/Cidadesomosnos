@@ -38,6 +38,8 @@ async def create_post(
     content: str = Form(...),
     published_at: str = Form(...),          # YYYY-MM-DD
     instagram_url: str | None = Form(None),
+    author: str = Form("Cidade Somos Nós"),
+    category: str = Form("Geral"),
     media: list[UploadFile] = File(...),    # múltiplas mídias
     db: Session = Depends(get_db),
 ):
@@ -55,6 +57,8 @@ async def create_post(
         title=title,
         content=content,
         instagram_url=instagram_url,
+        author=author,
+        category=category,
         published_at=published_at_dt,
     )
     db.add(post)
@@ -104,3 +108,15 @@ async def create_post(
     db.commit()
     db.refresh(post)
     return post
+
+
+@router.get("/categories", response_model=list[str])
+def list_categories(db: Session = Depends(get_db)):
+    """Lista todas as categorias únicas dos posts"""
+    categories = (
+        db.query(Post.category)
+        .filter(Post.category.isnot(None))
+        .distinct()
+        .all()
+    )
+    return [c[0] for c in categories if c[0]]

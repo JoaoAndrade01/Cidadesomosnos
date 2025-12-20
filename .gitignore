@@ -1,14 +1,48 @@
-# ambiente virtual
+# Ambiente virtual Python
 venv/
+.venv/
+env/
 
-# uploads de mídia
+# Uploads de mídia
 uploads/
 
-# caches python
+# Caches Python
 __pycache__/
 *.py[cod]
 *.pyo
+.pytest_cache/
 
-# configs de editor
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build outputs
+dist/
+build/
+*.local
+
+# Configs de editor
 .vscode/
 .idea/
+*.swp
+*.swo
+*~
+
+# Arquivos de ambiente
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+logs/
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# Database local
+*.db
+*.sqlite3
